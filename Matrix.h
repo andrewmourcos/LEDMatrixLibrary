@@ -13,8 +13,8 @@ class Matrix
   private:
     int rowDim;
     int colDim;
-    int *anode;
-    int *cathode;
+    byte *anode;
+    byte *cathode;
     bool** values;
 
   public:
@@ -23,8 +23,8 @@ class Matrix
     {
       rowDim = 0;
       colDim = 0;
-      anode = NULL;
-      cathode = NULL;
+      anode = nullptr;
+      cathode = nullptr;
       values = nullptr;
     }
     // data constructor
@@ -34,6 +34,9 @@ class Matrix
       colDim = colDim0;
       // create "2D array"
       values = new bool*[rowDim];
+      anode = new byte[rowDim];
+      cathode = new byte[colDim];
+      
       for(int i=0; i<rowDim; i++){
         values[i] = new bool[colDim];
       } 
@@ -41,17 +44,16 @@ class Matrix
       for(int row=0; row<rowDim; row++){
         for(int col=0; col<colDim; col++){
           values[row][col] = 0;
+          anode[row]=0;
+          cathode[col]=0;
         }
       }
     }
-
-    void setNodes(int ano[], int catho[])
+// TO BE FIXED
+    void setNodes(byte *ano, byte *catho)
     {
-      for(int i=0; i<rowDim; i++){
-        anode[i] == ano[i];
-      }
-      for(int j=0; j<colDim; j++){
-        cathode[j] == catho[j];
+      for(int row=0; row<rowDim; row++){
+          
       }
     }
 
@@ -77,21 +79,29 @@ class Matrix
 
     void multiplexMatrix() const
     {
-      for(int col=0; col <= colDim; col++){
-        digitalWrite(cathode[col-1], LOW);
-        if(col == colDim)
-          col=0;
-        for(int row=0; row<rowDim; row++){
-          if(values[row][col] == 1){
-            digitalWrite(anode[row],LOW);
-          }
-          else{
-            digitalWrite(anode[row], HIGH);
+      for (int thisRow = 0; thisRow < 8; thisRow++) {
+        // take the row pin (anode) high:
+        digitalWrite(anode[thisRow], HIGH);
+        // iterate over the cols (cathodes):
+        for (int thisCol = 0; thisCol < 8; thisCol++) {
+          // get the state of the current pixel;
+          int thisPixel = values[thisRow][thisCol];
+          // when the row is HIGH and the col is LOW,
+          // the LED where they meet turns on:
+          digitalWrite(cathode[thisCol], thisPixel);
+          // turn the pixel off:
+          if (thisPixel == LOW) {
+            digitalWrite(cathode[thisCol], HIGH);
           }
         }
-        digitalWrite(cathode[col], HIGH);
-        delay(500);
+        // take the row pin low to turn off the whole row:
+        digitalWrite(anode[thisRow], LOW);
       }
+    }
+
+    byte yeet() const
+    {
+      return anode[5];
     }
     
     // destructor
@@ -99,10 +109,10 @@ class Matrix
     {
       delete[] values;
       values = NULL;
-//      delete[] cathode;
-//      cathode = NULL;
-//      delete[] anode;
-//      anode = NULL;
+      delete[] cathode;
+      cathode = NULL;
+      delete[] anode;
+      anode = NULL;
     }
     
     
