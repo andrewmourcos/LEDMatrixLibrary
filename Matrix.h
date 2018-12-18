@@ -13,54 +13,54 @@ class Matrix
   private:
     int rowDim;
     int colDim;
-    bool *values;
-    int *anodes;
-    int *cathodes;
-    
+    bool** values;
+
   public:
     // default data constructor
     Matrix()
     {
       rowDim = 0;
       colDim = 0;
-      values=NULL;
-      anodes = NULL;
-      cathodes = NULL;
+      values = nullptr;
     }
     // data constructor
     Matrix(int rowDim0, int colDim0)
     {
       rowDim = rowDim0;
       colDim = colDim0;
-      values = new bool[rowDim][colDim];
-      anodes = new int[rowDim];
-      cathodes = new int[colDim];
+      // create "2D array"
+      values = new bool*[rowDim];
+      for(int i=0; i<rowDim; i++){
+        values[i] = new bool[colDim];
+      } 
+      // fill it with zeroes
       for(int row=0; row<rowDim; row++){
         for(int col=0; col<colDim; col++){
           values[row][col] = 0;
         }
       }
     }
-    // mutator for anode/cathodes
-    void setNodes(int ano[], int catho[])
-    {
-      for(int i=0; i<rowDim; i++){
-        anode[i] == ano[i];
-      }
-      for(int j=0; j<colDim; j++){
-        cathode[j] == catho[j];
-      }
-    }
-    // mutator to fill matrix
-    void fillMatrix(bool arr[][])
-    {
-      for(int row=0; row<rowDim; row++){
-        for(int col=0; col<colDim; col++){
-          (*this).values[row][col] == arr[row][col];
-        }
-      }
-    }
 
+//    // mutator for anode/cathodes
+//    void setNodes(int ano[], int catho[])
+//    {
+//      for(int i=0; i<rowDim; i++){
+//        anode[i] == ano[i];
+//      }
+//      for(int j=0; j<colDim; j++){
+//        cathode[j] == catho[j];
+//      }
+//    }
+
+    // mutator to fill matrix
+    void fillMatrix(bool* arr)
+    {
+      int bytes = colDim*sizeof(bool);
+      for(int row=0; row<rowDim; row++){
+        memcpy(values[row],arr+row*colDim,bytes);
+      }
+    }
+    
     void slideMatrix(bool scrollLeft)
     {
       for(int row=0; row<rowDim; row++){
@@ -73,7 +73,7 @@ class Matrix
       }
     }
 
-    void showMatrix() const
+    void MultiplexMatrix() const
     {
       
     }
@@ -83,10 +83,10 @@ class Matrix
     {
       delete[] values;
       values = NULL;
-      delete[] cathode;
-      cathode = NULL;
-      delete[] anode;
-      anode = NULL;
+//      delete[] cathode;
+//      cathode = NULL;
+//      delete[] anode;
+//      anode = NULL;
     }
     
     
