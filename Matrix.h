@@ -63,17 +63,21 @@ class Matrix
         memcpy(values[row],arr+row*colDim,bytes);
       }
     }
-    
-    void scroll(bool scrollLeft)
+    // returns whether it is done scrolling
+    bool scroll()
     {
+      int tally=0;
       for(int col=0; col<colDim; col++){
         for(int row=0; row<rowDim; row++){
-          if(scrollLeft)
-            values[row][col] = values[row][col+1];
+          
+          if(col==colDim-1)
+            values[row][col]=0;
           else
-            values[row][col] = values[row][col-1];
+            values[row][col] = values[row][col+1];
+          tally += values[row][col];
         }
       }
+      return tally;
     }
 
     void multiplexMatrix(int duration) const
@@ -93,15 +97,21 @@ class Matrix
             digitalWrite(cathode[col], LOW);
         }
         digitalWrite(anode[row], LOW);
-        delayMicroseconds(600);
+        delayMicroseconds(100);
       }
     }
     
     // destructor
     ~Matrix()
     {
-      delete[] values;
-      values = NULL;
+      if(values != NULL){
+        for(int row=0; row<rowDim; row++){
+          delete[] values[row];
+          values[row] = NULL;
+        }
+        delete[] values;
+        values = NULL;
+      }
       delete[] cathode;
       cathode = NULL;
       delete[] anode;
