@@ -49,7 +49,7 @@ class Matrix
         }
       }
     }
-// TO BE FIXED
+
     void setNodes(byte ano[], byte catho[])
     {
       memcpy(anode, ano, rowDim);
@@ -63,8 +63,9 @@ class Matrix
         memcpy(values[row],arr+row*colDim,bytes);
       }
     }
+    
     // returns whether it is done scrolling
-    bool scroll()
+    bool slide()
     {
       int tally=0;
       for(int col=0; col<colDim; col++){
@@ -78,6 +79,10 @@ class Matrix
         }
       }
       return tally;
+    }
+
+    void scrollText(int duration){
+      
     }
 
     void multiplexMatrix(int duration) const
