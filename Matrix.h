@@ -50,11 +50,10 @@ class Matrix
       }
     }
 // TO BE FIXED
-    void setNodes(byte *ano, byte *catho)
+    void setNodes(byte ano[], byte catho[])
     {
-      for(int row=0; row<rowDim; row++){
-          
-      }
+      memcpy(anode, ano, rowDim);
+      memcpy(cathode, catho, colDim);
     }
 
     void fillMatrix(bool* arr)
@@ -65,43 +64,37 @@ class Matrix
       }
     }
     
-    void slideMatrix(bool scrollLeft)
+    void scroll(bool scrollLeft)
     {
-      for(int row=0; row<rowDim; row++){
-        for(int col=0; col<colDim; col++){
+      for(int col=0; col<colDim; col++){
+        for(int row=0; row<rowDim; row++){
           if(scrollLeft)
-            (*this).values[row][col] == (*this).values[row][col-1];
+            values[row][col] = values[row][col+1];
           else
-            (*this).values[row][col] == (*this).values[row][col+1];
+            values[row][col] = values[row][col-1];
         }
       }
     }
 
-    void multiplexMatrix() const
+    void multiplexMatrix(int duration) const
     {
-      for (int thisRow = 0; thisRow < 8; thisRow++) {
-        // take the row pin (anode) high:
-        digitalWrite(anode[thisRow], HIGH);
-        // iterate over the cols (cathodes):
-        for (int thisCol = 0; thisCol < 8; thisCol++) {
-          // get the state of the current pixel;
-          int thisPixel = values[thisRow][thisCol];
-          // when the row is HIGH and the col is LOW,
-          // the LED where they meet turns on:
-          digitalWrite(cathode[thisCol], thisPixel);
-          // turn the pixel off:
-          if (thisPixel == LOW) {
-            digitalWrite(cathode[thisCol], HIGH);
-          }
+      int temps=millis();
+      int row=0;
+      while(duration > millis()-temps){
+        digitalWrite(anode[row], HIGH);  
+        row++;
+        if (row == rowDim) {
+          row = 0;
         }
-        // take the row pin low to turn off the whole row:
-        digitalWrite(anode[thisRow], LOW);
+        for(int col=0; col<colDim; col++){
+          if(values[row][col] == 1)
+            digitalWrite(cathode[col], HIGH);
+          else
+            digitalWrite(cathode[col], LOW);
+        }
+        digitalWrite(anode[row], LOW);
+        delayMicroseconds(600);
       }
-    }
-
-    byte yeet() const
-    {
-      return anode[5];
     }
     
     // destructor
